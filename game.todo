@@ -1,0 +1,34 @@
+Done: movement handler
+Done: attack mechanism (projectile)
+Done: attack mechanism (melee)
+Done: spawn enemies
+TODO: add sprite {
+    Done: UI {
+        Done: Health Bar
+        Done: Ammo
+        Done: Score
+        Done: crosshair
+        TODO: Indicator cooldown
+    }
+    TODO: Player {
+        TODO: idle
+        TODO: walking
+        TODO: shooting
+        TODO: melee
+        TODO: swap weapon
+    }
+    TODO: GUI {
+        TODO: Start Menu
+        TODO: Pause menu
+        TODO: Death menu
+    }
+    TODO: enemies
+    TODO: Background (optional)
+}
+TODO: particle (spawn particles when killed)
+TODO: Camera system
+TODO: limit world size
+TODO: spawn pickups (weapons/health/one-time effect)
+TODO: change weapons
+TODO: SFX (shooting, taking damage, killing)
+

@@ -7,7 +7,7 @@ import { getState, state } from "./modules/States.js"
 import { handle as handleMovement } from "./modules/MovementHandler.js"
 import Player from "./modules/GameObjects/Player.js"
 import GameObject from "./modules/GameObjects/GameObject.js"
-import Camera from "./modules/camera.js"
+import Camera from "./modules/Camera.js"
 import { FLAGS, runPeriodicFunctions } from "./modules/PeriodicActions.js"
 import Sprite from "./modules/GameObjects/Sprite.js"
 import UiText from './modules/GameObjects/UiText.js'

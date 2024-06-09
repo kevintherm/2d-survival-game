@@ -18,7 +18,8 @@ export default class GameObject {
             framesHold: null,
             paused: null
         },
-        audioManager = null
+        audioManager = null,
+        destroyWhenKilled = true
     }) {
         this.x = x
         this.y = y
@@ -66,11 +67,13 @@ export default class GameObject {
             throw new Error("Invalid instance of AudioManager.")
 
         this.audioManager = audioManager
+
+        this.destroyWhenKilled = destroyWhenKilled
     }
 
 
     draw(ctx) {
-        if (this.isHidden) return
+        // if (this.isHidden) return
 
         if (!(ctx instanceof CanvasRenderingContext2D))
             throw Error("Instance of RenderingContext2D is required!")
@@ -120,9 +123,6 @@ export default class GameObject {
     }
 
     takeDamage(damage = 0) {
-
-
-
         this.hp -= damage
         this.flash()
         if (this.spriteObject)
@@ -130,9 +130,13 @@ export default class GameObject {
 
 
         if (this.hp <= 0) {
-            this.kill()
             if (this.audioManager)
                 this.audioManager.play("die", 0.5)
+
+            this.kill()
+
+            if (this.destroyWhenKilled)
+                this._killInjectedProperty()
         }
     }
 
@@ -164,14 +168,17 @@ export default class GameObject {
     }
 
     kill() {
-        this.hp = 0
         this.isDead = true
         this.isHidden = true
         this.x = -100
         this.y = -100
         this.velX = 0
         this.velY = 0
+    }
 
+    resetAttr() {
+        this.isDead = false
+        this.isHidden = false
     }
 
     _killInjectedProperty() {

@@ -121,3 +121,9 @@ export function rectCollision(rect1, rect2) {
         rect1.y + rect1.height > rect2.y
     );
 }
+
+export function randPos(minRange, maxRange, width, height) {
+    const posX = Math.random() < 0.5 ? randNum(minRange, 0) : randNum(width, width + maxRange);
+    const posY = Math.random() < 0.5 ? randNum(minRange, 0) : randNum(height, height + maxRange);
+    return { x: posX, y: posY };
+}

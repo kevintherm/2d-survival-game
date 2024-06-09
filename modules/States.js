@@ -11,7 +11,7 @@ export const state = {
     mouse: { x: 0, y: 0 },
     mouseClick: false,
     worldBorder: {},
-    DEBUG: false,
+    DEBUG: true,
     SHADOWBLUR: true,
     audio: null
 }

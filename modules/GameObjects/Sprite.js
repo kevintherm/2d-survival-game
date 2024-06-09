@@ -57,7 +57,7 @@ export default class Sprite {
             throw Error("Instance of CanvasRenderingContext2D required.")
 
         if (this.shadowBlur) {
-            ctx.shadowColor = "white"
+            ctx.shadowColor = "rgba(255, 255, 255, 0.5)"
             ctx.shadowBlur = this.shadowBlur
         }
 
@@ -74,6 +74,7 @@ export default class Sprite {
         const scaleX = this.flipX ? -1 : 1;
         const scaleY = this.flipY ? -1 : 1;
         ctx.scale(scaleX, scaleY);
+
 
         // Draw the image with the new origin
         ctx.filter = `brightness(${this.brightness}%)`
@@ -92,13 +93,10 @@ export default class Sprite {
 
         ctx.restore();
 
-        if (!this.text) return
+        if (this.text)
+            this.drawText(ctx)
 
-        const align = this.textPos === 'right' ? 1 : -1
 
-        ctx.font = `${this.textSize}px QuinqueFive`
-        ctx.fillStyle = "white"
-        ctx.fillText(this.text, this.x + this.image.width * align + this.textSize, this.y + this.textSize)
     }
 
     animateFrames() {
@@ -134,5 +132,13 @@ export default class Sprite {
             this.brightness = 100
             clearTimeout(timeoutId)
         }, 50)
+    }
+
+    drawText(ctx) {
+        const align = this.textPos === 'right' ? 1 : -1
+
+        ctx.font = `${this.textSize}px QuinqueFive`
+        ctx.fillStyle = "white"
+        ctx.fillText(this.text, this.x + this.image.width * align + this.textSize, this.y + this.textSize)
     }
 }

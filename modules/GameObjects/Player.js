@@ -20,9 +20,10 @@ export default class Player extends GameObject {
             framesHold: null,
             paused: null
         },
-        audioManager = null
+        audioManager = null,
+        destroyWhenKilled = true
     }) {
-        super(x, y, width, height, { velX, velY, color, sprite, audioManager })
+        super(x, y, width, height, { velX, velY, color, sprite, audioManager, destroyWhenKilled })
 
         this.showDirectionIndicator = showDirectionIndicator
         this.directionIndicatorSize = directionIndicatorSize
@@ -43,6 +44,7 @@ export default class Player extends GameObject {
 
         this.ammo = 12
         this.maxAmmo = 12
+        this.carriedMagazines = 100
         this.shootDelay = 250
         this.lastShotTime = 0
         this.reloadCooldown = 750
@@ -145,7 +147,15 @@ export default class Player extends GameObject {
         this.audioManager.play("reload", 0.2)
 
         this.reloadTimeoutId = setTimeout(() => {
-            this.ammo = this.maxAmmo
+
+            if (this.carriedMagazines !== null) {
+                if (this.carriedMagazines > 0) {
+                    this.carriedMagazines--
+                    this.ammo = this.maxAmmo
+                }
+            } else
+                this.ammo = this.maxAmmo
+
             this.isReloading = false
             this.reloadTimeoutId = null
         }, this.reloadCooldown)

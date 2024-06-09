@@ -2,7 +2,7 @@
 
 import setup from "./modules/Setup.js"
 import { attachListener } from './modules/Listener.js'
-import { clearCanvas, distanceBetween, randNum, rectCircleCollision, rectCollision, spawnNewEnemy } from "./modules/Functions.js"
+import { clearCanvas, distanceBetween, randNum, randPos, rectCircleCollision, rectCollision, spawnNewEnemy } from "./modules/Functions.js"
 import { getState, state } from "./modules/States.js"
 import { handle as handleMovement } from "./modules/MovementHandler.js"
 import Player from "./modules/GameObjects/Player.js"
@@ -18,7 +18,7 @@ let SCORE = 0
 let ENEMY_KILLED = 0
 let timePassed = 0
 
-const [ctx, { CANVAS_WIDTH, audio }] = setup({
+const [ctx, { CANVAS_WIDTH, CANVAS_HEIGHT, audio }] = setup({
     canvasPadding: 10,
     canvasBackgroundColor: 'rgb(40, 40, 40)',
 })
@@ -62,7 +62,6 @@ const _uiHealth = new Sprite(32, 16, {
     framesMax: 1,
     scale: 1.5,
     text: 0,
-    shadowBlur: 10
 })
 
 const _uiAmmo = new Sprite(144, 16, {
@@ -71,7 +70,6 @@ const _uiAmmo = new Sprite(144, 16, {
     currentFrame: 0,
     scale: 1.5,
     textSize: 15,
-    shadowBlur: 10
 })
 
 const _uiScore = new Sprite(CANVAS_WIDTH - 96, 16, {
@@ -81,7 +79,6 @@ const _uiScore = new Sprite(CANVAS_WIDTH - 96, 16, {
     scale: 1.5,
     textSize: 15,
     text: 0,
-    shadowBlur: 10
 })
 
 
@@ -92,10 +89,14 @@ const pistol = new Sprite(100, 100, {
     scale: 1.2,
 })
 
-// spawn max enemies: 10
-for (let i = 0; i < 10; i++) {
+// spawn max enemies: 25
+for (let i = 0; i < 1; i++) {
     enemies.push(
-        spawnNewEnemy({ options: { spriteOptions: { shadowBlur: 10 } } })
+        spawnNewEnemy({
+            options: {
+                destroyWhenKilled: false
+            }
+        })
     )
 }
 
@@ -108,11 +109,6 @@ function main() {
 
     // camera.begin()
 
-    console.table({
-        playerProjectiles: player.projectiles.length,
-        enemies: enemies.length,
-
-    })
 
 
 
@@ -232,6 +228,7 @@ function main() {
         // }
     })
 
+
     for (let i = 0; i < enemies.length; i++) {
         const enemy = enemies[i]
 
@@ -263,7 +260,13 @@ function main() {
                 player.projectiles.splice(iProjectile, 1)
 
                 if (enemy.isDead) {
-                    enemies.splice(i, 1)
+                    const { x, y } = randPos(-500, 500, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+                    enemy.hp = 100
+                    enemy.x = x
+                    enemy.y = y
+
+                    enemy.resetAttr()
                     ENEMY_KILLED++
                 }
 
@@ -283,7 +286,7 @@ function main() {
     _uiScore.text = String(ENEMY_KILLED)
 
     _uiAmmo.update(ctx)
-    _uiAmmo.text = String(player.ammo)
+    _uiAmmo.text = `${String(player.ammo)}/${player.carriedMagazines ?? "∞"}`
     if (player.isReloading)
         _uiAmmo.text = "Reloading"
 

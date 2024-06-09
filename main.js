@@ -90,7 +90,7 @@ const pistol = new Sprite(100, 100, {
 })
 
 // spawn max enemies: 25
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 5; i++) {
     enemies.push(
         spawnNewEnemy({
             options: {

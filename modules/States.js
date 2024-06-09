@@ -11,7 +11,9 @@ export const state = {
     mouse: { x: 0, y: 0 },
     mouseClick: false,
     worldBorder: {},
-    DEBUG: true
+    DEBUG: false,
+    SHADOWBLUR: true,
+    audio: null
 }
 
 export function getState() {

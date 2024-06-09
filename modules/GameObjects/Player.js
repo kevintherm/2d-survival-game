@@ -1,6 +1,6 @@
 import GameObject from "./GameObject.js"
-import Triangle from "./Triangle.js"
 import Projectile from './Projectile.js'
+import Triangle from "./Triangle.js"
 import { getState } from "../States.js"
 import { distanceBetween, outOfScreen } from "../Functions.js"
 
@@ -12,22 +12,29 @@ export default class Player extends GameObject {
         directionIndicatorSize = 25,
         directionIndicatorLength = 25,
         showDirectionIndicator = false,
-        projectileSize = 10,
-        projectileSpeed = 5,
+        projectileSize = 5,
+        projectileSpeed = 6,
+        sprite = {
+            imageSrc: null,
+            framesMax: null,
+            framesHold: null,
+            paused: null
+        },
+        audioManager = null
     }) {
-        super(x, y, width, height, { velX, velY, color })
+        super(x, y, width, height, { velX, velY, color, sprite, audioManager })
 
         this.showDirectionIndicator = showDirectionIndicator
         this.directionIndicatorSize = directionIndicatorSize
         this.directionIndicatorLength = directionIndicatorLength
 
-        this.directionIndicator = new Triangle(
+        this.directionIndicator = this.showDirectionIndicator ? new Triangle(
             this.x,
             this.y,
             this.directionIndicatorSize,
             this.directionIndicatorLength,
             { color: this.color }
-        )
+        ) : null
 
 
         this.projectileSpeed = projectileSpeed
@@ -36,11 +43,13 @@ export default class Player extends GameObject {
 
         this.ammo = 12
         this.maxAmmo = 12
-        this.lastShootTime = 0
+        this.shootDelay = 250
+        this.lastShotTime = 0
         this.reloadCooldown = 750
-        this.reloadTimeoutId = null
         this.isReloading = false
         this.isAttacking = false
+        this.reloadTimeoutId = null
+        this.isShooting = false
 
 
     }
@@ -49,8 +58,16 @@ export default class Player extends GameObject {
         this.draw(ctx)
         this.updatePosition()
         this.updateProjectiles(ctx)
+
+
         if (this.showDirectionIndicator)
             this.updateDirectionIndicator(ctx)
+
+        if (this.spriteObject)
+            this.updateSprite(ctx)
+
+        if (this.isShooting)
+            this.shootProjectile()
 
     }
 
@@ -76,6 +93,7 @@ export default class Player extends GameObject {
             this.projectiles[i].update(ctx)
 
             if (outOfScreen(this.projectiles[i])) {
+                this.projectiles[i].kill()
                 this.projectiles.splice(i, 1)
             }
         }
@@ -83,8 +101,8 @@ export default class Player extends GameObject {
 
     spawnNewProjectile(velX, velY) {
         return new Projectile(
-            this.center.x,
-            this.center.y,
+            this.directionIndicator.x,
+            this.directionIndicator.y + 6,
             this.projectileSize,
             {
                 color: this.color,
@@ -94,25 +112,28 @@ export default class Player extends GameObject {
         )
     }
 
-    shootProjectile(mouseX, mouseY) {
+    shootProjectile() {
         const currentTime = performance.now()
 
-        if (this.ammo > 0) {
-            const { x, y } = distanceBetween(this.center, { x: mouseX, y: mouseY })
+        const mousePos = getState().mouse
 
-            this.projectiles.push(
-                this.spawnNewProjectile(
-                    x * this.projectileSpeed,
-                    y * this.projectileSpeed
+        if (currentTime - this.lastShotTime >= this.shootDelay) {
+            if (this.ammo > 0) {
+                const { x, y } = distanceBetween(this.center, mousePos)
+
+                this.projectiles.push(
+                    this.spawnNewProjectile(
+                        x * this.projectileSpeed,
+                        y * this.projectileSpeed
+                    )
                 )
-            )
+                this.audioManager.play("shoot", 0.2)
 
-            this.ammo--
-            this.lastShootTime = currentTime
-
-            // console.log(`Shot fired! Ammo left: ${this.ammo}`)
-        } else {
-            this.reloadAmmo()
+                this.ammo--
+                this.lastShotTime = currentTime;
+            } else {
+                this.reloadAmmo()
+            }
         }
     }
 
@@ -121,12 +142,28 @@ export default class Player extends GameObject {
         this.isReloading = true
         if (this.reloadTimeoutId) return
 
+        this.audioManager.play("reload", 0.2)
+
         this.reloadTimeoutId = setTimeout(() => {
             this.ammo = this.maxAmmo
             this.isReloading = false
             this.reloadTimeoutId = null
         }, this.reloadCooldown)
 
+    }
+
+    shoot() {
+        this.isShooting = true
+        const timeoutId = setTimeout(() => {
+            this.isShooting = false
+            clearTimeout(timeoutId)
+        }, 2000)
+    }
+
+    _killInjectedProperty() {
+        this.audioManager = null
+        this.spriteObject = null
+        this.directionIndicator = null
     }
 
 }

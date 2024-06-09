@@ -1,5 +1,7 @@
 import { distanceBetween, randNum } from '../Functions.js'
 import { getState } from '../States.js'
+import Sprite from './Sprite.js'
+import AudioManager from '../AudioManager.js'
 
 export default class GameObject {
     constructor(x, y, width, height, {
@@ -7,7 +9,16 @@ export default class GameObject {
         velY = 0,
         color = 'black',
         _objectShape = 'Rect',
-        health = 100
+        health = 100,
+        directionAngle = 0,
+        floatingRadius = 60,
+        sprite = {
+            imageSrc: null,
+            framesMax: null,
+            framesHold: null,
+            paused: null
+        },
+        audioManager = null
     }) {
         this.x = x
         this.y = y
@@ -31,9 +42,30 @@ export default class GameObject {
             enumerable: true
         })
 
-        this.health = health
+        this.hp = health
         this.maxHealth = 100
         this.isDead = false
+
+        this.directionAngle = directionAngle
+        this.directionAngleInDeg = null
+        this.floatingRadius = floatingRadius
+
+        this.spriteObject = null
+        if (sprite && sprite.imageSrc) {
+            this.spriteObject = new Sprite(
+                this.x,
+                this.y,
+                {
+                    imageSrc: sprite.imageSrc,
+                    ...sprite
+                }
+            )
+        }
+
+        if (audioManager && !(audioManager instanceof AudioManager))
+            throw new Error("Invalid instance of AudioManager.")
+
+        this.audioManager = audioManager
     }
 
 
@@ -57,6 +89,7 @@ export default class GameObject {
 
     update(ctx) {
         this.draw(ctx)
+        this.updateSprite(ctx)
         this.updatePosition()
     }
 
@@ -87,18 +120,19 @@ export default class GameObject {
     }
 
     takeDamage(damage = 0) {
-        this.health -= damage
+
+
+
+        this.hp -= damage
         this.flash()
+        if (this.spriteObject)
+            this.spriteObject.flash()
 
 
-        if (this.health <= 0) {
-            this.health = 0
-            this.isDead = true
-            this.isHidden = true
-            this.x = -100
-            this.y = -100
-            this.velX = 0
-            this.velY = 0
+        if (this.hp <= 0) {
+            this.kill()
+            if (this.audioManager)
+                this.audioManager.play("die", 0.5)
         }
     }
 
@@ -111,5 +145,37 @@ export default class GameObject {
             this.velX = x * this.movSpeed * 0.8
             this.velY = y * this.movSpeed * 0.8
         }
+    }
+
+    floatAround(object) {
+        this.directionAngle += 0.01
+
+        if (!(object instanceof GameObject))
+            throw Error("Instance of GameObject is required")
+
+        this.x = object.center.x + this.floatingRadius * -Math.cos(this.directionAngle)
+        this.y = object.center.y + this.floatingRadius * -Math.sin(this.directionAngle)
+    }
+
+    updateSprite(ctx) {
+        this.spriteObject.update(ctx)
+        this.spriteObject.x = this.x - (this.width / 2)
+        this.spriteObject.y = this.y - (this.height / 2 - 10)
+    }
+
+    kill() {
+        this.hp = 0
+        this.isDead = true
+        this.isHidden = true
+        this.x = -100
+        this.y = -100
+        this.velX = 0
+        this.velY = 0
+
+    }
+
+    _killInjectedProperty() {
+        this.audioManager = null
+        this.spriteObject = null
     }
 }

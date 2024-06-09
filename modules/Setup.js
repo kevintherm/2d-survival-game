@@ -1,4 +1,5 @@
 import { getState, state } from "./States.js"
+import AudioManager from "./AudioManager.js"
 
 export default function setup({
     canvasPadding = 10,
@@ -15,6 +16,14 @@ export default function setup({
             path: './assets/fonts/QuinqueFive.otf'
         }
     ])
+
+    const audio = new AudioManager()
+
+    audio.preload({
+        shoot: './assets/sfx/pistol-shoot.wav',
+        reload: './assets/sfx/pistol-reload.wav',
+        die: './assets/sfx/8bit_explosion.wav',
+    })
 
     canvas.style.cursor = 'crosshair'
 
@@ -41,7 +50,7 @@ export default function setup({
     state.canvas.width = CANVAS_WIDTH
     state.canvas.height = CANVAS_HEIGHT
 
-    return [ctx, { CANVAS_WIDTH, CANVAS_HEIGHT, dom: canvas }]
+    return [ctx, { CANVAS_WIDTH, CANVAS_HEIGHT, dom: canvas, audio }]
 }
 
 export function loadFonts(fonts = []) {

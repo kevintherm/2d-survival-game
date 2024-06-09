@@ -7,14 +7,12 @@ export default class Triangle extends GameObject {
         directionAngle = 0,
         floatingRadius = 60
     }) {
-        super(x, y, null, null, { color })
+        super(x, y, null, null, { color, directionAngle, floatingRadius })
 
         this.height = height
         this.base = base
         this.rotation = rotation
-        this.directionAngle = directionAngle
-        this.directionAngleInDeg = null
-        this.floatingRadius = floatingRadius
+
     }
 
     draw(ctx) {
@@ -56,13 +54,5 @@ export default class Triangle extends GameObject {
         this.rotation = this.directionAngleInDeg + 270 // Magic number adjust accordingly
     }
 
-    floatAround(object) {
-        this.directionAngle += 0.01
 
-        if (!(object instanceof GameObject))
-            throw Error("Instance of GameObject is required")
-
-        this.x = object.center.x + this.floatingRadius * -Math.cos(this.directionAngle)
-        this.y = object.center.y + this.floatingRadius * -Math.sin(this.directionAngle)
-    }
 }

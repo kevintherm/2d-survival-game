@@ -35,7 +35,6 @@ export function outOfScreen(object) {
             object.y > world.height)
 
     if (object.shape === 'Arc')
-
         return (object.x + (object.radius) < 0 ||
             object.x - object.radius > world.width ||
             object.y + (object.radius) < 0 ||
@@ -44,14 +43,13 @@ export function outOfScreen(object) {
     return Error("Unknown object position.")
 }
 
-export function spawnNewEnemy(args = { x: null, y: null, size: null, options: { spawnZone: null } }) {
-    const sizeValue = args.size || randNum(25, 100);
+export function spawnNewEnemy(args = { x: null, y: null, size: null, options: { spawnZone: null, spriteOptions: {} } }) {
+    const sizeValue = 50;
     let xPos, yPos;
 
-    if (args.x !== null && args.y !== null) {
+    if (args.x && args.y && args.x !== null && args.y !== null) {
         xPos = args.x;
         yPos = args.y;
-
     } else {
         const { spawnZone } = args.options;
         if (spawnZone && spawnZone.length > 0) { // Check if spawnZone is defined and not empty
@@ -66,7 +64,19 @@ export function spawnNewEnemy(args = { x: null, y: null, size: null, options: { 
     }
 
     return new Player(xPos, yPos, sizeValue, sizeValue, {
-        color: 'red', ...args.options
+        color: 'red',
+        sprite: {
+            imageSrc: './assets/slime-idle.png',
+            framesMax: 6,
+            scale: 1.5,
+            offset: {
+                x: 48,
+                y: 78
+            },
+            ...args?.options?.spriteOptions
+        },
+        audioManager: getState().audio
+        , ...args.options
     })
 }
 

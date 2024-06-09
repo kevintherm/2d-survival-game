@@ -8,12 +8,12 @@ TODO: add sprite {
         Done: Ammo
         Done: Score
         Done: crosshair
-        TODO: Indicator cooldown
+        TODO: Indicator melee cooldown
     }
     TODO: Player {
-        TODO: idle
-        TODO: walking
-        TODO: shooting
+        Done: idle
+        Done: walking
+        Done: shooting
         TODO: melee
         TODO: swap weapon
     }
@@ -22,7 +22,7 @@ TODO: add sprite {
         TODO: Pause menu
         TODO: Death menu
     }
-    TODO: enemies
+    Done: enemies
     TODO: Background (optional)
 }
 TODO: particle (spawn particles when killed)
@@ -30,5 +30,5 @@ TODO: Camera system
 TODO: limit world size
 TODO: spawn pickups (weapons/health/one-time effect)
 TODO: change weapons
-TODO: SFX (shooting, taking damage, killing)
+Done: SFX (shooting, taking damage, killing)
 

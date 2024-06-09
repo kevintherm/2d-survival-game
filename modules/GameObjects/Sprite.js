@@ -1,3 +1,6 @@
+import { getState } from "../States.js"
+
+/* eslint-disable no-unused-vars */
 export default class Sprite {
     constructor(x, y, {
         imageSrc,
@@ -12,12 +15,15 @@ export default class Sprite {
         shadowBlur = 0,
         rotation = 0,
         flipX = false,
-        flipY = false
+        flipY = false,
+        paused = false
     }) {
         this.x = x
         this.y = y
         this.image = new Image()
         this.image.src = imageSrc
+
+        this.defaultFramesHold = framesHold
 
         this.text = text
         this.textPos = textPos
@@ -31,7 +37,19 @@ export default class Sprite {
         this.shadowBlur = shadowBlur
         this.rotation = rotation
         this.flipX = flipX
-        this.fipY = flipY
+        this.flipY = flipY
+        this.brightness = 100
+
+        this.paused = paused
+
+        // if settings shadow blur is true then default value
+        // if false then turn off all shadow blur
+        // if integer value then set all to the settings value
+
+        if (getState().SHADOWBLUR === false)
+            this.shadowBlur = 0
+        else if (typeof getState().SHADOWBLUR === 'number')
+            this.shadowBlur = getState().SHADOWBLUR
     }
 
     draw(ctx) {
@@ -58,6 +76,7 @@ export default class Sprite {
         ctx.scale(scaleX, scaleY);
 
         // Draw the image with the new origin
+        ctx.filter = `brightness(${this.brightness}%)`
         ctx.drawImage(
             this.image,
             this.currentFrame * (this.image.width / this.framesMax),
@@ -70,6 +89,7 @@ export default class Sprite {
             this.image.height * this.scale
         );
 
+
         ctx.restore();
 
         if (!this.text) return
@@ -79,9 +99,6 @@ export default class Sprite {
         ctx.font = `${this.textSize}px QuinqueFive`
         ctx.fillStyle = "white"
         ctx.fillText(this.text, this.x + this.image.width * align + this.textSize, this.y + this.textSize)
-
-
-
     }
 
     animateFrames() {
@@ -96,16 +113,26 @@ export default class Sprite {
     }
 
     update(ctx) {
+        if (!this.paused) this.animateFrames()
+
         this.draw(ctx)
         ctx.shadowBlur = 0
     }
 
-    switchSprite({ imageSrc, framesMax = 8, action = null }) {
-        if (this.currentFrame > framesMax) {
-            this.currentFrame = 0
-        }
-
+    switchSprite({ imageSrc, framesMax = 8, framesHold = null }) {
         this.image.src = imageSrc
         this.framesMax = framesMax
+        this.framesHold = framesHold ? framesHold : this.defaultFramesHold
+
+        if (this.currentFrame > this.framesMax - 1)
+            this.currentFrame = 0
+    }
+
+    flash() {
+        this.brightness = 10000
+        const timeoutId = setTimeout(() => {
+            this.brightness = 100
+            clearTimeout(timeoutId)
+        }, 50)
     }
 }
